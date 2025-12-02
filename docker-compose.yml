@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: task-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: task_management_db
+      MYSQL_USER: task_app_user
+      MYSQL_PASSWORD: task_app_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpw"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cloudnative/task-management:dev
+    container_name: task-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USERNAME: task_app_user
+      DB_PASSWORD: task_app_secret
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/task_management_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      SPRING_PROFILES_ACTIVE: default
+
+volumes:
+  mysql_data:
+

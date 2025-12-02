@@ -68,6 +68,15 @@ Initial Spring Boot 3.3 service skeleton for a task management platform targetin
      -e SPRING_DATASOURCE_URL="jdbc:mysql://task-mysql:3306/task_management_db?useSSL=false&serverTimezone=UTC" \
      cloudnative/task-management:dev
    ```
+
+## Run Backend + MySQL via Docker Compose
+```bash
+docker compose up -d --build
+```
+- Builds the backend image (if needed) and starts `task-app` plus a MySQL 8.4 instance (`task-mysql`)
+- MySQL credentials are defined in `docker-compose.yml`; override by exporting `MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, etc. before running `docker compose`
+- Logs: `docker compose logs -f app mysql`
+- Stop and remove containers: `docker compose down`
 ## Next Steps
 - Model entities/repositories for `User`, `Project`, and `Task`
 - Add Flyway/Liquibase for migration tracking
