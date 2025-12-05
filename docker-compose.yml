@@ -36,6 +36,7 @@ services:
       DB_PASSWORD: task_app_secret
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/task_management_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
       SPRING_PROFILES_ACTIVE: default
+      JWT_SECRET: change-me-super-secret-key-change-me
 
 volumes:
   mysql_data:

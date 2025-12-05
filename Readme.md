@@ -77,7 +77,27 @@ docker compose up -d --build
 - MySQL credentials are defined in `docker-compose.yml`; override by exporting `MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, etc. before running `docker compose`
 - Logs: `docker compose logs -f app mysql`
 - Stop and remove containers: `docker compose down`
+## Authentication & Testing
+- Set `JWT_SECRET` (and optional `JWT_EXPIRATION_MS`) before running the app or Compose stack. Default values exist for local dev but you should override them for any shared environment.
+- Register a user: `POST /auth/register` with JSON body  
+  ```json
+  {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "password": "PlainText!23"
+  }
+  ```
+  Response includes a `token`.
+- Login: `POST /auth/login` with `email`/`password` to obtain another JWT.
+- Include the token in subsequent requests: `Authorization: Bearer <token>`.
+- Task APIs exposed:
+  - `GET /tasks`
+  - `POST /tasks`
+  - `PUT /tasks/{id}`
+  - `DELETE /tasks/{id}`
+  - `GET /tasks/search?status=IN_PROGRESS&priority=HIGH&assigneeId=1`
+
 ## Next Steps
-- Model entities/repositories for `User`, `Project`, and `Task`
-- Add Flyway/Liquibase for migration tracking
-- Introduce security configuration and JWT-based authentication
+- Add validation annotations and better error messaging
+- Implement role-based authorization (admin vs regular user)
+- Introduce Flyway/Liquibase for migration tracking
