@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 
 /**
  * Represents units of work that belong to the task management domain.
@@ -42,11 +43,15 @@ public class Task {
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     protected Task() {
         // JPA requirement
     }
 
-    public Task(String title, String description, Status status, Priority priority, User assignee) {
+    public Task(String title, String description, Status status, Priority priority, User assignee, User owner) {
         this.title = title;
         this.description = description;
         if (status != null) {
@@ -56,6 +61,7 @@ public class Task {
             this.priority = priority;
         }
         this.assignee = assignee;
+        this.owner = Objects.requireNonNull(owner, "owner is required");
     }
 
     public Long getId() {
@@ -100,6 +106,14 @@ public class Task {
 
     public void setAssignee(User assignee) {
         this.assignee = assignee;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = Objects.requireNonNull(owner, "owner is required");
     }
 
     public enum Status {

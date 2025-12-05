@@ -49,7 +49,7 @@ public class SecurityConfig {
         return username -> userRepository.findByEmail(username)
                 .map(user -> User.withUsername(user.getEmail())
                         .password(user.getPassword())
-                        .roles("USER")
+                        .roles(user.getRole().name())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

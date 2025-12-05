@@ -15,6 +15,10 @@ import com.cloudnative.taskmanagement.user.UserRepository;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +35,14 @@ public class TaskService {
 
     @Transactional
     public Task createTask(CreateTaskRequest request) {
+        User owner = getCurrentUser();
         Task task = new Task(
                 Objects.requireNonNull(request.title(), "title is required"),
                 request.description(),
                 request.status(),
                 request.priority(),
-                resolveAssignee(request.assigneeId())
+                resolveAssignee(request.assigneeId()),
+                owner
         );
         return taskRepository.save(task);
     }
@@ -55,6 +61,7 @@ public class TaskService {
     @Transactional
     public Task updateTask(Long taskId, UpdateTaskRequest request) {
         Task task = getTask(taskId);
+        requireOwnershipOrAdmin(task);
 
         if (request.title() != null) {
             task.setTitle(request.title());
@@ -78,12 +85,14 @@ public class TaskService {
     @Transactional
     public void deleteTask(Long taskId) {
         Task task = getTask(taskId);
+        requireOwnershipOrAdmin(task);
         taskRepository.delete(task);
     }
 
     @Transactional
     public Task assignTask(Long taskId, Long userId) {
         Task task = getTask(taskId);
+        requireOwnershipOrAdmin(task);
         User assignee = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User %d not found".formatted(userId)));
         task.setAssignee(assignee);
@@ -125,6 +134,36 @@ public class TaskService {
             return base;
         }
         return base == null ? Specification.where(addition) : base.and(addition);
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("Authentication is required");
+        }
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User %s not found".formatted(email)));
+    }
+
+    private void requireOwnershipOrAdmin(Task task) {
+        User currentUser = getCurrentUser();
+        if (isAdmin(currentUser)) {
+            return;
+        }
+        if (!isOwner(task, currentUser)) {
+            throw new AccessDeniedException("You do not have permission to modify this task");
+        }
+    }
+
+    private boolean isAdmin(User user) {
+        return user.getRole() == User.Role.ADMIN;
+    }
+
+    private boolean isOwner(Task task, User user) {
+        return task.getOwner() != null && Objects.equals(task.getOwner().getId(), user.getId());
     }
 }
 
