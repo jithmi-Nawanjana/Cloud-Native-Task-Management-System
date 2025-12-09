@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
 
@@ -148,6 +149,7 @@ function TaskList() {
                   <th>Status</th>
                   <th>Priority</th>
                   <th>Assignee</th>
+              <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,6 +176,14 @@ function TaskList() {
                         ? `${task.assigneeName} (${task.assigneeId})`
                         : 'Unassigned'}
                     </td>
+                  <td className="actions">
+                    <Link className="text-link" to={`/tasks/${task.id}/view`}>
+                      View
+                    </Link>
+                    <Link className="text-link" to={`/tasks/${task.id}`}>
+                      Edit
+                    </Link>
+                  </td>
                   </tr>
                 ))}
               </tbody>

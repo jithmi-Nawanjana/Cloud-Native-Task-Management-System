@@ -2,6 +2,7 @@ import { NavLink, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import TaskList from './pages/TaskList.jsx'
 import TaskCreate from './pages/TaskCreate.jsx'
+import TaskDetail from './pages/TaskDetail.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import './App.css'
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tasks" element={<TaskList />} />
+          <Route path="/tasks/:id/view" element={<TaskDetail />} />
           <Route path="/tasks/new" element={<TaskCreate />} />
           <Route path="/tasks/:id" element={<TaskCreate />} />
           <Route path="/login" element={<Login />} />
