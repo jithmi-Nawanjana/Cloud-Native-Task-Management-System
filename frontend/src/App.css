@@ -100,6 +100,14 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
+select {
+  background: #0b1221;
+  border: 1px solid #1f2937;
+  color: #e2e8f0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
 button.primary {
   background: #2563eb;
   color: #fff;
@@ -117,4 +125,126 @@ button.primary:hover {
 
 button.primary:active {
   transform: translateY(1px);
+}
+
+button.ghost {
+  background: transparent;
+  color: #cbd5e1;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+}
+
+button.ghost:hover {
+  border-color: #334155;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.form-group.inline span {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid #1f2937;
+}
+
+.table th {
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.task-title {
+  font-weight: 600;
+}
+
+.muted {
+  color: #94a3b8;
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-backlog {
+  background: #111827;
+  border: 1px solid #1f2937;
+  color: #cbd5e1;
+}
+
+.status-in_progress {
+  background: #0b3b26;
+  border: 1px solid #14532d;
+  color: #86efac;
+}
+
+.status-done {
+  background: #0b2c3b;
+  border: 1px solid #0ea5e9;
+  color: #7dd3fc;
+}
+
+.status-archived {
+  background: #1f2937;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+}
+
+.priority-low {
+  background: #1f2937;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+}
+
+.priority-medium {
+  background: #0b3b26;
+  border: 1px solid #14532d;
+  color: #86efac;
+}
+
+.priority-high {
+  background: #3b2f0b;
+  border: 1px solid #b45309;
+  color: #fbbf24;
+}
+
+.priority-critical {
+  background: #3b0f0f;
+  border: 1px solid #b91c1c;
+  color: #fca5a5;
+}
+
+.error {
+  color: #fca5a5;
+  margin: 0.75rem 0;
 }
