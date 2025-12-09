@@ -1,3 +1,30 @@
+# Maven / Java
+target/
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+
+# Node / Vite frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.npm-cache/
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.eslintcache
+
+# Root npm cache (if ever used locally)
+.npm-cache/
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
