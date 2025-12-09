@@ -27,6 +27,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tasks" element={<TaskList />} />
           <Route path="/tasks/new" element={<TaskCreate />} />
+          <Route path="/tasks/:id" element={<TaskCreate />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
