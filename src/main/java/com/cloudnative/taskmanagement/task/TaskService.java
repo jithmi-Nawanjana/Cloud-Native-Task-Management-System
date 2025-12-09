@@ -10,6 +10,7 @@ import com.cloudnative.taskmanagement.task.Task.Status;
 import com.cloudnative.taskmanagement.task.dto.CreateTaskRequest;
 import com.cloudnative.taskmanagement.task.dto.TaskFilter;
 import com.cloudnative.taskmanagement.task.dto.UpdateTaskRequest;
+import com.cloudnative.taskmanagement.notification.EmailService;
 import com.cloudnative.taskmanagement.user.User;
 import com.cloudnative.taskmanagement.user.UserRepository;
 import java.util.List;
@@ -27,10 +28,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, EmailService emailService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -44,7 +47,11 @@ public class TaskService {
                 resolveAssignee(request.assigneeId()),
                 owner
         );
-        return taskRepository.save(task);
+        Task saved = taskRepository.save(task);
+        if (saved.getAssignee() != null) {
+            emailService.sendTaskAssignmentEmail(saved, saved.getAssignee());
+        }
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +70,9 @@ public class TaskService {
         Task task = getTask(taskId);
         requireOwnershipOrAdmin(task);
 
+        Status previousStatus = task.getStatus();
+        User previousAssignee = task.getAssignee();
+
         if (request.title() != null) {
             task.setTitle(request.title());
         }
@@ -79,7 +89,22 @@ public class TaskService {
             task.setAssignee(resolveAssignee(request.assigneeId()));
         }
 
-        return taskRepository.save(task);
+        Task saved = taskRepository.save(task);
+
+        if (request.status() != null && request.status() != previousStatus) {
+            emailService.sendTaskStatusChangedEmail(saved, previousStatus);
+        }
+
+        if (request.assigneeId() != null && !Objects.equals(
+                previousAssignee != null ? previousAssignee.getId() : null,
+                saved.getAssignee() != null ? saved.getAssignee().getId() : null
+        )) {
+            if (saved.getAssignee() != null) {
+                emailService.sendTaskAssignmentEmail(saved, saved.getAssignee());
+            }
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -96,7 +121,9 @@ public class TaskService {
         User assignee = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User %d not found".formatted(userId)));
         task.setAssignee(assignee);
-        return taskRepository.save(task);
+        Task saved = taskRepository.save(task);
+        emailService.sendTaskAssignmentEmail(saved, assignee);
+        return saved;
     }
 
     @Transactional(readOnly = true)
