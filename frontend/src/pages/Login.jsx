@@ -1,13 +1,26 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { login as loginRequest } from '../api/auth'
 
 function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    // TODO: wire to backend auth endpoint
-    console.log('Login', { email, password })
+    setLoading(true)
+    setError('')
+    try {
+      await loginRequest(email, password)
+      navigate('/tasks')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -33,8 +46,9 @@ function Login() {
               required
             />
           </label>
-          <button type="submit" className="primary">
-            Sign In
+          {error && <p className="error">{error}</p>}
+          <button type="submit" className="primary" disabled={loading}>
+            {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
       </div>

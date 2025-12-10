@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+import { createTask, fetchTask, updateTask } from '../api/tasks'
 
 const STATUSES = ['BACKLOG', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -22,26 +21,12 @@ function TaskCreate() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const authHeaders = useMemo(() => {
-    const token = localStorage.getItem('token')
-    return token ? { Authorization: `Bearer ${token}` } : {}
-  }, [])
-
   const loadTask = async () => {
     if (!isEdit) return
     setLoading(true)
     setError('')
     try {
-      const resp = await fetch(`${API_BASE_URL}/tasks/${id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders,
-        },
-      })
-      if (!resp.ok) {
-        throw new Error(`Failed to load task (${resp.status})`)
-      }
-      const data = await resp.json()
+      const data = await fetchTask(id)
       setForm({
         title: data.title ?? '',
         description: data.description ?? '',
@@ -79,20 +64,10 @@ function TaskCreate() {
         assigneeId: form.assigneeId ? Number(form.assigneeId) : null,
       }
 
-      const endpoint = isEdit ? `${API_BASE_URL}/tasks/${id}` : `${API_BASE_URL}/tasks`
-      const method = isEdit ? 'PUT' : 'POST'
-
-      const resp = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!resp.ok) {
-        throw new Error(`Save failed (${resp.status})`)
+      if (isEdit) {
+        await updateTask(id, payload)
+      } else {
+        await createTask(payload)
       }
 
       setSuccess(isEdit ? 'Task updated!' : 'Task created!')

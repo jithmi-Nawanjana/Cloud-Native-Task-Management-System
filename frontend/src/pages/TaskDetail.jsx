@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+import { fetchTask } from '../api/tasks'
 
 function TaskDetail() {
   const { id } = useParams()
@@ -10,26 +9,12 @@ function TaskDetail() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const authHeaders = useMemo(() => {
-    const token = localStorage.getItem('token')
-    return token ? { Authorization: `Bearer ${token}` } : {}
-  }, [])
-
   useEffect(() => {
     const loadTask = async () => {
       setLoading(true)
       setError('')
       try {
-        const resp = await fetch(`${API_BASE_URL}/tasks/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeaders,
-          },
-        })
-        if (!resp.ok) {
-          throw new Error(`Failed to load task (${resp.status})`)
-        }
-        const data = await resp.json()
+        const data = await fetchTask(id)
         setTask(data)
       } catch (err) {
         setError(err.message || 'Unable to load task')
@@ -39,7 +24,7 @@ function TaskDetail() {
     }
 
     loadTask()
-  }, [id, authHeaders])
+  }, [id])
 
   return (
     <div className="page">

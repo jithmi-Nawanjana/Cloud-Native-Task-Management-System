@@ -1,14 +1,27 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { register as registerRequest } from '../api/auth'
 
 function Register() {
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    // TODO: wire to backend registration endpoint
-    console.log('Register', { name, email, password })
+    setLoading(true)
+    setError('')
+    try {
+      await registerRequest(name, email, password)
+      navigate('/tasks')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -43,8 +56,9 @@ function Register() {
               required
             />
           </label>
-          <button type="submit" className="primary">
-            Register
+          {error && <p className="error">{error}</p>}
+          <button type="submit" className="primary" disabled={loading}>
+            {loading ? 'Creating...' : 'Register'}
           </button>
         </form>
       </div>

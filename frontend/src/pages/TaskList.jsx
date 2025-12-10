@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
+import { fetchTasks as fetchTasksApi } from '../api/tasks'
 
 const STATUSES = ['BACKLOG', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -16,33 +15,12 @@ function TaskList() {
     assigneeId: '',
   })
 
-  const authHeaders = useMemo(() => {
-    const token = localStorage.getItem('token')
-    return token ? { Authorization: `Bearer ${token}` } : {}
-  }, [])
-
-  const fetchTasks = async () => {
+  const fetchTasks = async (overrideFilters = filters) => {
     setLoading(true)
     setError('')
 
     try {
-      const params = new URLSearchParams()
-      if (filters.status) params.set('status', filters.status)
-      if (filters.priority) params.set('priority', filters.priority)
-      if (filters.assigneeId) params.set('assigneeId', filters.assigneeId)
-
-      const query = params.toString()
-      const url = `${API_BASE_URL}/tasks/search${query ? `?${query}` : ''}`
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders,
-        },
-      })
-      if (!response.ok) {
-        throw new Error(`Request failed (${response.status})`)
-      }
-      const data = await response.json()
+      const data = await fetchTasksApi(overrideFilters)
       setTasks(Array.isArray(data) ? data : [])
     } catch (err) {
       setError(err.message || 'Failed to load tasks')
@@ -61,8 +39,9 @@ function TaskList() {
   }
 
   const handleReset = () => {
-    setFilters({ status: '', priority: '', assigneeId: '' })
-    fetchTasks()
+    const resetFilters = { status: '', priority: '', assigneeId: '' }
+    setFilters(resetFilters)
+    fetchTasks(resetFilters)
   }
 
   return (
