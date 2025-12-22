@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { createTask, fetchTask, updateTask } from '../api/tasks'
+import { isAdmin } from '../api/client'
 
 const STATUSES = ['BACKLOG', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -82,6 +83,7 @@ function TaskCreate() {
 
   return (
     <div className="page">
+      {!isAdmin() && <Navigate to="/tasks" replace />}
       <h2>{isEdit ? 'Edit Task' : 'Create Task'}</h2>
       <div className="card">
         <form className="form" onSubmit={handleSubmit}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchTasks as fetchTasksApi } from '../api/tasks'
+import { isAdmin } from '../api/client'
 
 const STATUSES = ['BACKLOG', 'IN_PROGRESS', 'DONE', 'ARCHIVED']
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -127,8 +128,8 @@ function TaskList() {
                   <th>Title</th>
                   <th>Status</th>
                   <th>Priority</th>
-                  <th>Assignee</th>
-              <th>Actions</th>
+              <th>Assignee</th>
+              {isAdmin() && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -155,14 +156,16 @@ function TaskList() {
                         ? `${task.assigneeName} (${task.assigneeId})`
                         : 'Unassigned'}
                     </td>
-                  <td className="actions">
-                    <Link className="text-link" to={`/tasks/${task.id}/view`}>
-                      View
-                    </Link>
-                    <Link className="text-link" to={`/tasks/${task.id}`}>
-                      Edit
-                    </Link>
-                  </td>
+                  {isAdmin() && (
+                    <td className="actions">
+                      <Link className="text-link" to={`/tasks/${task.id}/view`}>
+                        View
+                      </Link>
+                      <Link className="text-link" to={`/tasks/${task.id}`}>
+                        Edit
+                      </Link>
+                    </td>
+                  )}
                   </tr>
                 ))}
               </tbody>

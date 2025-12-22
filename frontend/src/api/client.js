@@ -34,5 +34,23 @@ export const errorMessage = (error, fallback = 'Request failed') => {
   return fallback
 }
 
+const decodePayload = (token) => {
+  try {
+    const [, payload] = token.split('.')
+    return JSON.parse(atob(payload))
+  } catch {
+    return null
+  }
+}
+
+export const getUserRole = () => {
+  const token = getAuthToken()
+  if (!token) return null
+  const payload = decodePayload(token)
+  return payload?.role ?? payload?.roles?.[0] ?? null
+}
+
+export const isAdmin = () => getUserRole() === 'ADMIN'
+
 export default apiClient
 

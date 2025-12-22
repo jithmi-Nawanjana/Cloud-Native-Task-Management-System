@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { fetchTask } from '../api/tasks'
+import { isAdmin } from '../api/client'
 
 function TaskDetail() {
   const { id } = useParams()
@@ -79,9 +80,11 @@ function TaskDetail() {
 
         {!loading && !error && task && (
           <div className="detail-actions">
-            <Link className="primary link-button" to={`/tasks/${id}`}>
-              Edit Task
-            </Link>
+            {isAdmin() && (
+              <Link className="primary link-button" to={`/tasks/${id}`}>
+                Edit Task
+              </Link>
+            )}
             <Link className="ghost link-button" to="/tasks">
               Back to list
             </Link>

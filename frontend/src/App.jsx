@@ -6,6 +6,7 @@ import TaskDetail from './pages/TaskDetail.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import { isAdmin } from './api/client'
 import './App.css'
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
             Home
           </NavLink>
           <NavLink to="/tasks">Tasks</NavLink>
-          <NavLink to="/tasks/new">New Task</NavLink>
+          {isAdmin() && <NavLink to="/tasks/new">New Task</NavLink>}
           <NavLink to="/login">Login</NavLink>
           <NavLink to="/register">Register</NavLink>
         </nav>
