@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login as loginRequest } from '../api/auth'
+import { hasAuthToken } from '../api/client'
 
 function Login() {
   const navigate = useNavigate()
@@ -8,6 +9,12 @@ function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (hasAuthToken()) {
+      navigate('/tasks')
+    }
+  }, [navigate])
 
   const handleSubmit = async (event) => {
     event.preventDefault()

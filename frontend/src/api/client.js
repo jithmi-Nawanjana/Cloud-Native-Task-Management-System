@@ -3,6 +3,7 @@ import axios from 'axios'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
 
 export const getAuthToken = () => localStorage.getItem('token')
+export const hasAuthToken = () => Boolean(getAuthToken())
 export const setAuthToken = (token) => {
   if (token) {
     localStorage.setItem('token', token)

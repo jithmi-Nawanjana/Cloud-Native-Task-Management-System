@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { register as registerRequest } from '../api/auth'
+import { hasAuthToken } from '../api/client'
 
 function Register() {
   const navigate = useNavigate()
@@ -9,6 +10,12 @@ function Register() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (hasAuthToken()) {
+      navigate('/tasks')
+    }
+  }, [navigate])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
