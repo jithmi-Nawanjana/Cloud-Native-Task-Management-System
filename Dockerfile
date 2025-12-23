@@ -1,24 +1,20 @@
-FROM eclipse-temurin:17-jdk-jammy AS builder
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 WORKDIR /workspace
 
-# Pre-download Maven wrapper dependencies
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
-RUN chmod +x mvnw
-# Copy source and build
-COPY src/ src/
-RUN ./mvnw -q -DskipTests package
+# Copy project files and build
+COPY pom.xml .
+COPY src ./src
+RUN mvn -q -DskipTests package
 
 FROM eclipse-temurin:17-jre-jammy AS runtime
 WORKDIR /app
 
-# Provide overridable JVM flags and Spring profile
+# Overridable JVM flags and Spring profile
 ENV JAVA_OPTS=""
 ENV SPRING_PROFILES_ACTIVE=default
 
 # Copy built jar from the builder stage
-ARG JAR_FILE=target/*.jar
-COPY --from=builder /workspace/${JAR_FILE} app.jar
+COPY --from=builder /workspace/target/*.jar /app/app.jar
 
 EXPOSE 8080
 
