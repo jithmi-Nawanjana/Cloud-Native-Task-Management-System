@@ -19,12 +19,12 @@ services:
       retries: 5
       start_period: 30s
 
-  app:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    image: cloudnative/task-management:dev
-    container_name: task-app
+    image: cloudnative/task-backend:dev
+    container_name: task-backend
     restart: unless-stopped
     depends_on:
       mysql:
@@ -37,6 +37,27 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/task_management_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
       SPRING_PROFILES_ACTIVE: default
       JWT_SECRET: change-me-super-secret-key-change-me
+      MAIL_HOST: smtp.sendgrid.net
+      MAIL_PORT: 587
+      MAIL_USERNAME: apikey
+      MAIL_PASSWORD: replace-with-sendgrid-api-key
+      MAIL_FROM: no-reply@taskmanagement.local
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: cloudnative/task-frontend:dev
+    container_name: task-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8081:80"
+    environment:
+      # Vite build should have baked API base URL, but keep for clarity
+      VITE_API_BASE_URL: http://localhost:8080
 
 volumes:
   mysql_data:
